@@ -23,22 +23,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
 
     // Debugging output
+    println!("ZKSYNC_URL: {:?}", env::var("ZKSYNC_URL"));
     println!("FINGERPRINT_PROXY_SC: {:?}", env::var("FINGERPRINT_PROXY_SC"));
     println!("ZKSYNC_SEPOLIA_PRIVATE_KEY: {:?}", env::var("ZKSYNC_SEPOLIA_PRIVATE_KEY"));
 
-    let zk_sync_url = "https://sepolia.era.zksync.dev";
-    let provider = Provider::<Http>::try_from(zk_sync_url)?;
+    let zksync_url = env::var("ZKSYNC_URL")?;
+    let chain_id: u64 = env::var("CHAIN_ID")?.parse()?;
+    let provider = Provider::<Http>::try_from(zksync_url)?;
     let contract_address_str = env::var("FINGERPRINT_PROXY_SC")?;
     let private_key = env::var("ZKSYNC_SEPOLIA_PRIVATE_KEY")?;
 
     let contract_address: Address = contract_address_str.parse()?;
     let wallet: LocalWallet = private_key.parse()?;
-    let wallet = wallet.with_chain_id(300u64); // Sepolia chain ID as u64
+    let wallet = wallet.with_chain_id(chain_id);
     let client = Arc::new(SignerMiddleware::new(provider, wallet));
 
     let fingerprint = Fingerprint {
         gamer: "Merkle".to_string(),
-        strikes: 793287,
+        strikes: 79328729,
         place: "SP".to_string(),
         weapon: "AK-4724".to_string(),
         place2: "Y".to_string(),
