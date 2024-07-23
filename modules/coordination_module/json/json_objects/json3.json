@@ -1,1 +1,7 @@
-{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake (Ultimate)", "guild": "Horde"}
+{
+    "game": "World of Warcraft",
+    "character": "Arthas",
+    "ability": "Death Coil",
+    "place": "Icecrown",
+    "place2": "Northrend"
+}

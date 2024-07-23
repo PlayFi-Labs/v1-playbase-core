@@ -1,1 +1,7 @@
-{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake"}
+{
+    "game": "World of Warcraft",
+    "character": "Illidan",
+    "ability": "Metamorphosis",
+    "place": "Black Temple",
+    "place2": "Outland"
+}

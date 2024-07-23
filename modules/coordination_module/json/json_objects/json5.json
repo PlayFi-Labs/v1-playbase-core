@@ -1,1 +1,7 @@
-{"game": "World of Warcraft", "character": "Jaina", "ability": "Frostbolt"}
+{
+    "game": "World of Warcraft",
+    "character": "Gul'dan",
+    "ability": "Fel Flame",
+    "place": "Shadowmoon Valley",
+    "place2": "Draenor"
+}

@@ -1,1 +1,7 @@
-{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake (Ultimate)", "damage": 1000, "type": "AoE"}
+{
+    "game": "World of Warcraft",
+    "character": "Thrall",
+    "ability": "Earthquake",
+    "place": "Orgrimmar",
+    "place2": "Durotar Forest"
+}
