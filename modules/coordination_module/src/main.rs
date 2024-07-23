@@ -1,34 +1,30 @@
-use colored::*;
+use json_comparator::run_json_comparator;
+use fingerprint::{run_fingerprint, Fingerprint};
+use serde_json::Value;
 
-#[macro_use]
-mod data;
-mod hash;
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // Ejecutar json_comparator y obtener el JSON con mejor similitud
+    let best_json_str = match run_json_comparator() {
+        Some(json) => json,
+        None => {
+            println!("No JSON objects met the similarity threshold.");
+            return Ok(());
+        }
+    };
 
-use hash::minhash_comparison::{calculate_similarities, find_best_similarity};
+    // Parsear el JSON resultante para crear un objeto Fingerprint
+    let best_json: Value = serde_json::from_str(&best_json_str)?;
+    let fingerprint = Fingerprint {
+        gamer: best_json["character"].as_str().unwrap_or_default().to_string(),
+        strikes: 0, // Asigna un valor adecuado aquí
+        place: best_json["place"].as_str().unwrap_or_default().to_string(),
+        weapon: best_json["ability"].as_str().unwrap_or_default().to_string(),
+        place2: best_json["place2"].as_str().unwrap_or_default().to_string(),
+    };
 
-fn main() {
-    let similarity_threshold = 0.72;
-    println!("\nSimilarity Threshold: {}%", format!("{:.1}", similarity_threshold * 100.0).blue());
+    // Ejecutar el proceso de fingerprint con el objeto Fingerprint resultante
+    run_fingerprint(fingerprint).await?;
 
-    let num_hash_functions = 100;
-    println!("Number of Hash Functions: {}\n", num_hash_functions.to_string().blue());
-
-
-    // Example JSON objects
-    let json_strs = vec![
-        r#"{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake"}"#,
-        r#"{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake", "level": "99"}"#,
-        r#"{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake", "guild": "Horde"}"#,
-        r#"{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake", "race": "Orc"}"#,
-        r#"{"game": "World of Warcraft", "character": "Jaina", "ability": "Frostbolt"}"#,
-        r#"{"game": "World of Warcraft", "character": "Thrall", "ability": "Earthquake"}"#,  
-    ];
-
-    
-    calculate_similarities(json_strs.clone(), similarity_threshold, num_hash_functions);
-    if let Some(best_json) = find_best_similarity(json_strs, similarity_threshold, num_hash_functions) {
-        println!("\nThe JSON with the best similarity is: {}", best_json.green().bold());
-    } else {
-        println!("\nNo JSON objects met the similarity threshold.");
-    }
+    Ok(())
 }
