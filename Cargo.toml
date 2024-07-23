@@ -4,6 +4,7 @@ members = [
     "modules/coordination_module",
     "modules/coordination_module/json_comparator",
     "modules/coordination_module/fingerprint",
+    "modules/coordination_module/json",
     "modules/zk_module",
     "modules/storage_module"
 ]
