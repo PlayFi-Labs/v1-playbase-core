@@ -42,6 +42,18 @@ cargo build
 
 ### Usage
 
+### Coordination Module
+
+#### Running the `coordination_module`
+
+Navigate to the root directory of the project and run:
+
+```bash
+cargo run --package coordination_module
+```
+
+This will execute the coordination module functionality, which includes loading JSON objects, running the JSON comparator, and processing the resulting best JSON object with the fingerprint functionality.
+
 #### Running the `json_comparator`
 
 Navigate to the root directory of the project and run:
@@ -63,5 +75,14 @@ cargo run --package fingerprint
 
 This will execute the fingerprint functionality within the coordination module, which interacts with the blockchain.
 
+#### Running the `json`
+
+Navigate to the root directory of the project and run:
+
+```bash
+cargo run --package json
+```
+
+This will execute the JSON loading functionality, which reads JSON objects from the specified directory and prints them out to verify they have been loaded correctly
 
 
