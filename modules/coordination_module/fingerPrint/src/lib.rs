@@ -37,7 +37,8 @@ pub async fn run_fingerprint(fingerprint: Fingerprint) -> Result<(), Box<dyn std
 
     insert::insert_hash::insert_fingerprint(client.clone(), contract_address, &fingerprint_hash).await?;
     let is_appended = check::check_hash::check_fingerprint(client.clone(), contract_address, &fingerprint_hash).await?;
-    println!("Fingerprint appended: {}", is_appended);
+    println!("Fingerprint appended: ");
+    println!("\x1b[32;1m{}\x1b[0m", is_appended);
 
     Ok(())
 }

@@ -48,7 +48,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     insert_fingerprint(client.clone(), contract_address, &fingerprint_hash).await?;
     let is_appended = check_fingerprint(client.clone(), contract_address, &fingerprint_hash).await?;
-    println!("Fingerprint appended: {}", is_appended);
+    println!("Fingerprint appended: ");
+    println!("\x1b[32;1m{}\x1b[0m", is_appended);
 
     Ok(())
 }

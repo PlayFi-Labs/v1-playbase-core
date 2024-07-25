@@ -2,6 +2,7 @@ use ethers::prelude::*;
 use ethers::types::{transaction::eip2718::TypedTransaction, Address};
 use ethers::utils::keccak256;
 use std::sync::Arc;
+use std::process;
 
 pub async fn insert_fingerprint(
     client: Arc<SignerMiddleware<Provider<Http>, LocalWallet>>,
@@ -18,8 +19,8 @@ pub async fn insert_fingerprint(
     let call = client.call(&TypedTransaction::Legacy(TransactionRequest::new().to(contract_address).data(data_check).from(client.address())), None).await?;
     let is_appended: bool = ethers::abi::decode(&[ethers::abi::ParamType::Bool], &call)?.pop().unwrap().into_bool().unwrap();
     if is_appended {
-        println!("Fingerprint Hash already inserted. Operation stopped");
-        return Ok(());
+        println!("\x1b[31;1mFingerprint Hash already inserted. Operation stopped\x1b[0m");
+        process::exit(0);    
     }
 
     let function_signature = "appendData(bytes32)";
@@ -29,9 +30,10 @@ pub async fn insert_fingerprint(
     data.extend_from_slice(&data_hash_padded);
 
     let tx = client.send_transaction(TypedTransaction::Legacy(TransactionRequest::new().to(contract_address).data(data).from(client.address())), None).await?;
-    println!("Transaction sent: {:?}", tx);
-    let receipt = tx.await?;
-    println!("Transaction confirmed: {:?}", receipt);
+    println!("Transaction sent:");
+    println!("\x1b[32;1m{:?}\x1b[0m", tx.tx_hash());
+    tx.await?.ok_or("Failed to fetch transaction receipt")?;
+    println!("\x1b[32;1mTransaction confirmed\x1b[0m");
 
     Ok(())
 }
