@@ -1,8 +1,8 @@
 use colored::*;
 
 #[macro_use]
-mod data;
-mod hash;
+pub mod data;
+pub mod hash;
 
 use hash::minhash_comparison::{calculate_similarities, find_best_similarity};
 

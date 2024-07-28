@@ -1,10 +1,6 @@
 use colored::*;
 
-#[macro_use]
-mod data;
-mod hash;
-
-use hash::minhash_comparison::{calculate_similarities, find_best_similarity};
+use json_comparator::hash::minhash_comparison::{calculate_similarities, find_best_similarity};
 
 fn main() {
     let similarity_threshold = 0.72;

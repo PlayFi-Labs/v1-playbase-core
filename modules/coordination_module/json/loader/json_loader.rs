@@ -15,7 +15,7 @@ fn main() {
 
         json_objects
     }
-    let json_objects = load_json_objects("modules/coordination_module/json/json_objects");
+    let json_objects = load_json_objects("modules/coordination_module/json/src/json_objects");
     
     // Imprime los objetos JSON cargados para verificar que se han cargado correctamente
     for (i, json) in json_objects.iter().enumerate() {

@@ -9,7 +9,7 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "json_comparator"
-path = "src/main.rs"
+path = "comparator/json_comparator.rs"
 
 [dependencies]
 probabilistic-collections = "0.7.0"

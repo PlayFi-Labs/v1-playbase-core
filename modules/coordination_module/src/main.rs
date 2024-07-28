@@ -8,7 +8,7 @@ use serde_json::Value;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Load JSON objects from the specified directory
-    let json_objects = load_json_objects("modules/coordination_module/json/json_objects").await;
+    let json_objects = load_json_objects("modules/coordination_module/json/src/json_objects").await;
 
     // Run the JSON comparator and get the JSON object with the highest similarity
     let best_json_str = match run_json_comparator(&json_objects) {

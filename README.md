@@ -54,35 +54,33 @@ cargo run --package coordination_module
 
 This will execute the coordination module functionality, which includes loading JSON objects, running the JSON comparator, and processing the resulting best JSON object with the fingerprint functionality.
 
-#### Running the `json_comparator`
+#### Running the `json_comparator` setup
 
 Navigate to the root directory of the project and run:
 
 ```bash
-cargo run --package json_comparator
+cargo run --bin json_comparator
 ```
 
 This will execute the JSON comparator functionality within the coordination module.
 
-#### Running the `fingerprint`
+#### Running the `fingerprint` setup
 
 Navigate to the root directory of the project and run:
 
 
 ```bash
-cargo run --package fingerprint
+cargo run --bin fingerprint_runner
 ```
 
 This will execute the fingerprint functionality within the coordination module, which interacts with the blockchain.
 
-#### Running the `json`
+#### Running the `json` setup
 
 Navigate to the root directory of the project and run:
 
 ```bash
-cargo run --package json
+cargo run --bin json_loader
 ```
 
 This will execute the JSON loading functionality, which reads JSON objects from the specified directory and prints them out to verify they have been loaded correctly
-
-

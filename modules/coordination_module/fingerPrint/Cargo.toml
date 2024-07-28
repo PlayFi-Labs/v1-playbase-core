@@ -10,3 +10,11 @@ tokio = { version = "1.0", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 hex = "0.4"
+
+[lib]
+name = "fingerprint"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fingerprint_runner"
+path = "runner/fingerprint_runner.rs"
