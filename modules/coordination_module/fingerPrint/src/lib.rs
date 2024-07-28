@@ -10,6 +10,7 @@ use std::env;
 use std::sync::Arc;
 use serde::{Serialize, Deserialize};
 
+/// Represents a Fingerprint object.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Fingerprint {
     pub gamer: String,
@@ -19,6 +20,13 @@ pub struct Fingerprint {
     pub place2: String,
 }
 
+/// Runs the entire fingerprinting process.
+///
+/// # Parameters
+/// - `fingerprint`: The Fingerprint object to be processed.
+///
+/// # Returns
+/// - `Result<(), Box<dyn std::error::Error>>`: Returns `Ok(())` if the process is successful.
 pub async fn run_fingerprint(fingerprint: Fingerprint) -> Result<(), Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
 
