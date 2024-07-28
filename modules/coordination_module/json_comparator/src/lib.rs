@@ -6,6 +6,13 @@ mod hash;
 
 use hash::minhash_comparison::{calculate_similarities, find_best_similarity};
 
+/// Runs the JSON comparator on a given set of JSON objects.
+///
+/// # Parameters
+/// - `json_objects`: A slice of JSON strings.
+///
+/// # Returns
+/// - `Option<String>`: The JSON string with the highest similarity, if any.
 pub fn run_json_comparator(json_objects: &[String]) -> Option<String> {
     let similarity_threshold = 0.72;
     println!("\nSimilarity Threshold: {}%", format!("{:.1}", similarity_threshold * 100.0).blue());

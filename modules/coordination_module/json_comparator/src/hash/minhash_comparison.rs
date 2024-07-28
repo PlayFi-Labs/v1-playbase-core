@@ -3,6 +3,12 @@ use colored::*;
 
 use crate::data::json_set::json_to_sets;
 
+/// Calculates and prints the similarities between JSON objects using MinHash.
+///
+/// # Parameters
+/// - `json_strs`: A vector of JSON strings.
+/// - `similarity_threshold`: The threshold for considering two JSON objects similar.
+/// - `num_hash_functions`: The number of hash functions to use in MinHash.
 pub fn calculate_similarities(json_strs: Vec<&str>, similarity_threshold: f64, num_hash_functions: usize) {
     let json_sets = json_to_sets(&json_strs);
     
@@ -40,6 +46,15 @@ pub fn calculate_similarities(json_strs: Vec<&str>, similarity_threshold: f64, n
     }
 }
 
+/// Finds the JSON object with the highest similarity to others using MinHash.
+///
+/// # Parameters
+/// - `json_strs`: A vector of JSON strings.
+/// - `similarity_threshold`: The threshold for considering two JSON objects similar.
+/// - `num_hash_functions`: The number of hash functions to use in MinHash.
+///
+/// # Returns
+/// - `Option<String>`: The JSON string with the highest similarity, if any.
 pub fn find_best_similarity(json_strs: Vec<&str>, similarity_threshold: f64, num_hash_functions: usize) -> Option<String> {
     let json_sets = json_to_sets(&json_strs);
 
