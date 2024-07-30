@@ -2,3 +2,4 @@
 /Cargo.lock
 /modules/target
 /modules/Cargo.lock
+.env
