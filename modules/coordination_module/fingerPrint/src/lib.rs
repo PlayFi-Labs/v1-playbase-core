@@ -1,6 +1,7 @@
 pub mod insert;
 pub mod check;
 pub mod create;
+pub mod encoding;
 
 use ethers::prelude::*;
 use ethers::providers::{Http, Provider};

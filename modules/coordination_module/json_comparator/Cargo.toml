@@ -7,10 +7,6 @@ edition = "2021"
 name = "json_comparator"
 path = "src/lib.rs"
 
-[[bin]]
-name = "json_comparator"
-path = "comparator/json_comparator.rs"
-
 [dependencies]
 probabilistic-collections = "0.7.0"
 serde = { version = "1.0", features = ["derive"] }

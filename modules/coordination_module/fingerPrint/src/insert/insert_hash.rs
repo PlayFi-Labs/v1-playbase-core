@@ -1,8 +1,8 @@
 use ethers::prelude::*;
 use ethers::types::{transaction::eip2718::TypedTransaction, Address};
-use ethers::utils::keccak256;
 use std::sync::Arc;
 use std::process;
+use crate::encoding::encode::encode_function;
 
 /// Inserts a given fingerprint hash into the blockchain.
 ///
@@ -18,13 +18,9 @@ pub async fn insert_fingerprint(
     contract_address: Address,
     fingerprint: &str,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // Define the function signature for checking if a hash is appended
-    let function_signature_check = "isHashAppended(bytes32)";
-    let function_hash_check = &keccak256(function_signature_check.as_bytes())[0..4];
-    let data_hash_padded = hex::decode(&fingerprint[2..])?;
-    let mut data_check = Vec::new();
-    data_check.extend_from_slice(function_hash_check);
-    data_check.extend_from_slice(&data_hash_padded);
+   // Define the function signature for checking if a hash is appended
+   let function_signature_check = "isHashAppended(bytes32)";
+   let data_check = encode_function(fingerprint, function_signature_check)?;
 
     // Call the smart contract to check if the hash is appended
     let call = client.call(&TypedTransaction::Legacy(TransactionRequest::new().to(contract_address).data(data_check).from(client.address())), None).await?;
@@ -36,10 +32,7 @@ pub async fn insert_fingerprint(
 
     // Define the function signature for appending a hash
     let function_signature = "appendData(bytes32)";
-    let function_hash = &keccak256(function_signature.as_bytes())[0..4];
-    let mut data = Vec::new();
-    data.extend_from_slice(function_hash);
-    data.extend_from_slice(&data_hash_padded);
+    let data = encode_function(fingerprint, function_signature)?;
 
     // Send the transaction to append the hash
     let tx = client.send_transaction(TypedTransaction::Legacy(TransactionRequest::new().to(contract_address).data(data).from(client.address())), None).await?;

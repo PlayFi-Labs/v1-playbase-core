@@ -1,7 +1,7 @@
 use ethers::prelude::*;
 use ethers::types::{transaction::eip2718::TypedTransaction, Address};
-use ethers::utils::keccak256;
 use std::sync::Arc;
+use crate::encoding::encode::encode_function;
 
 /// Checks if a given fingerprint hash has already been appended to the blockchain.
 ///
@@ -19,11 +19,7 @@ pub async fn check_fingerprint(
 ) -> Result<bool, Box<dyn std::error::Error>> {
     // Define the function signature for checking if a hash is appended
     let function_signature_check = "isHashAppended(bytes32)";
-    let function_hash_check = &keccak256(function_signature_check.as_bytes())[0..4];
-    let data_hash_padded = hex::decode(&fingerprint[2..])?;
-    let mut data_check = Vec::new();
-    data_check.extend_from_slice(function_hash_check);
-    data_check.extend_from_slice(&data_hash_padded);
+    let data_check = encode_function(fingerprint, function_signature_check)?;
 
     // Call the smart contract to check if the hash is appended
     let call = client.call(&TypedTransaction::Legacy(TransactionRequest::new().to(contract_address).data(data_check).from(client.address())), None).await?;
