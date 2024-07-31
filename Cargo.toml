@@ -1,6 +1,10 @@
-[package]
-name = "v1-playbase-core"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
+[workspace]
+members = [
+    "modules/ai_module",
+    "modules/coordination_module",
+    "modules/coordination_module/json_comparator",
+    "modules/coordination_module/fingerprint",
+    "modules/coordination_module/json",
+    "modules/zk_module",
+    "modules/storage_module"
+]

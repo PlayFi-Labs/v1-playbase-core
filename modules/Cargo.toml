@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "ai_module",
+    "coordination_module",
+    "storage_module",
+    "zk_module",
+]
