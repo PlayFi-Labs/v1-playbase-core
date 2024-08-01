@@ -30,7 +30,7 @@ jobs:
         ls -R
 
     - name: Clean the build environment
-      run: cargo clean
+      run: cargo clean --workspace
 
     - name: Build
       run: cargo build --tests --workspace
