@@ -3,10 +3,10 @@ name: Rust CI
 on:
   push:
     branches:
-      - '*'
+      - '*'  # Run on all branches
   pull_request:
     branches:
-      - master
+      - master  # Run when merging into master
 
 jobs:
   build:
@@ -16,26 +16,21 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        fetch-depth: 0 # Ensure full history is fetched
 
-    - name: Set correct working directory
-      run: cd v1-playbase-core
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable  # Install the stable version of Rust
+        override: true
 
     - name: Debug - Print directory structure
       run: |
         pwd
         ls -R
 
-    - name: Set up Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        override: true
-
     - name: Build
       run: cargo build --verbose
-      working-directory: ./v1-playbase-core
 
     - name: Run tests
       run: cargo test --verbose
-      working-directory: ./v1-playbase-core
