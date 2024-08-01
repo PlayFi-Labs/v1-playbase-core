@@ -3,10 +3,10 @@ name: Rust CI
 on:
   push:
     branches:
-      - '*'  # Run on all branches
+      - '*'
   pull_request:
     branches:
-      - master  # Run when merging into master
+      - master
 
 jobs:
   build:
@@ -16,12 +16,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0 # Ensure full history is fetched
+        fetch-depth: 0
 
     - name: Set up Rust
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable  # Install the stable version of Rust
+        toolchain: stable
         override: true
 
     - name: Debug - Print directory structure
