@@ -3,10 +3,10 @@ name: Rust CI
 on:
   push:
     branches:
-      - '*'
+      - '*'  # Run on all branches
   pull_request:
     branches:
-      - master
+      - master  # Run when merging into master
 
 jobs:
   build:
@@ -15,16 +15,22 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # Ensure full history is fetched
 
     - name: Set up Rust
       uses: actions-rs/toolchain@v1
       with:
-        toolchain: stable
+        toolchain: stable  # Install the stable version of Rust
         override: true
+
+    - name: Debug - Print directory structure
+      run: |
+        pwd
+        ls -R
 
     - name: Build
       run: cargo build --verbose
-      working-directory: ./modules/coordination_module
 
     - name: Run tests
       run: cargo test --verbose
