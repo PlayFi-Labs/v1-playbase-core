@@ -29,6 +29,9 @@ jobs:
         pwd
         ls -R
 
+    - name: Clean the build environment
+      run: cargo clean
+
     - name: Build
       run: cargo build --verbose
 

@@ -9,6 +9,6 @@ serde_json = "1.0"
 tokio = { version = "1", features = ["full"] }
 colored = "2.0"
 async-trait = "0.1"
-json_comparator = { path = "../coordination_module/json_comparator" }
-fingerprint = { path = "../coordination_module/fingerprint" }
-json = { path = "../coordination_module/json" }
+json_comparator = { path = "json_comparator" }
+fingerprint = { path = "fingerprint" }
+json = { path = "json" }
