@@ -24,3 +24,57 @@ pub async fn load_json_objects(directory: &str) -> Vec<String> {
 
     json_objects
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::Write; // Import the Write trait
+    use tempfile::tempdir;
+    use serde_json::Value; // Import serde_json for JSON parsing
+
+    #[tokio::test]
+    async fn test_load_json_objects() {
+        // Create a temporary directory
+        let dir = tempdir().unwrap();
+        let dir_path = dir.path();
+
+        // Create mock JSON files in the temporary directory
+        let file_path1 = dir_path.join("file1.json");
+        let mut file1 = File::create(&file_path1).unwrap();
+        writeln!(file1, r#"{{"key": "value1"}}"#).unwrap();
+
+        let file_path2 = dir_path.join("file2.json");
+        let mut file2 = File::create(&file_path2).unwrap();
+        writeln!(file2, r#"{{"key": "value2"}}"#).unwrap();
+
+        // Call the function
+        let json_objects = load_json_objects(dir_path.to_str().unwrap()).await;
+
+        // Parse the expected JSON strings
+        let expected_json1: Value = serde_json::from_str(r#"{"key": "value1"}"#).unwrap();
+        let expected_json2: Value = serde_json::from_str(r#"{"key": "value2"}"#).unwrap();
+
+        // Parse the loaded JSON strings
+        let loaded_json1: Value = serde_json::from_str(&json_objects[0]).unwrap();
+        let loaded_json2: Value = serde_json::from_str(&json_objects[1]).unwrap();
+
+        // Assert the results
+        assert_eq!(json_objects.len(), 2);
+        assert!(loaded_json1 == expected_json1 || loaded_json1 == expected_json2);
+        assert!(loaded_json2 == expected_json1 || loaded_json2 == expected_json2);
+    }
+
+    #[tokio::test]
+    async fn test_load_json_objects_empty_directory() {
+        // Create a temporary directory
+        let dir = tempdir().unwrap();
+        let dir_path = dir.path();
+
+        // Call the function
+        let json_objects = load_json_objects(dir_path.to_str().unwrap()).await;
+
+        // Assert the results
+        assert!(json_objects.is_empty());
+    }
+}
