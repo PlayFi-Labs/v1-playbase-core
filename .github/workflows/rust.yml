@@ -24,6 +24,7 @@ jobs:
 
     - name: Build
       run: cargo build --verbose
+      working-directory: ./modules/coordination_module
 
     - name: Run tests
       run: cargo test --verbose
