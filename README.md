@@ -51,3 +51,13 @@ cargo run --package coordination_module
 ```
 
 This will execute the coordination module functionality, which includes loading JSON objects, running the JSON comparator, and processing the resulting best JSON object with the fingerprint functionality.
+
+### Running Tests
+
+To run the tests for the project, navigate to the root directory and execute:
+
+```bash
+cargo test
+```
+
+This will run all the tests defined in the project, ensuring that everything is working as expected

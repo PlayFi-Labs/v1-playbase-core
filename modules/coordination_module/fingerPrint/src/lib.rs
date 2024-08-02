@@ -58,12 +58,10 @@ mod tests {
     use ethers::types::H256;
     use std::error::Error;
 
-    // Mock function for create_fingerprint_hash
     fn mock_create_fingerprint_hash(_fingerprint: &Fingerprint) -> Result<H256, Box<dyn Error>> {
         Ok(H256::zero())
     }
 
-    // Mock function for insert_fingerprint
     async fn mock_insert_fingerprint(
         _client: Arc<SignerMiddleware<Provider<Http>, LocalWallet>>,
         _contract_address: Address,
@@ -72,7 +70,6 @@ mod tests {
         Ok(())
     }
 
-    // Mock function for check_fingerprint
     async fn mock_check_fingerprint(
         _client: Arc<SignerMiddleware<Provider<Http>, LocalWallet>>,
         _contract_address: Address,
@@ -83,7 +80,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_run_fingerprint() {
-        // Replace the actual functions with mocks
         let fingerprint = Fingerprint {
             gamer: "test_gamer".to_string(),
             strikes: 0,
@@ -92,31 +88,24 @@ mod tests {
             place2: "test_place2".to_string(),
         };
 
-        // Mock environment variables
         env::set_var("ZKSYNC_URL", "http://localhost:8545");
         env::set_var("CHAIN_ID", "1");
         env::set_var("FINGERPRINT_PROXY_SC", "0000000000000000000000000000000000000000"); // Removed '0x'
         env::set_var("ZKSYNC_SEPOLIA_PRIVATE_KEY", "4c0883a69102937d6231471b5dbb6204fe5129617082796e8e1a1e3b7a1e7e3e"); // Valid private key
 
-        // Mock provider and wallet
         let provider = Provider::<Http>::try_from("http://localhost:8545").unwrap();
         let wallet: LocalWallet = "4c0883a69102937d6231471b5dbb6204fe5129617082796e8e1a1e3b7a1e7e3e".parse().unwrap(); // Valid private key
         let wallet = wallet.with_chain_id(1u64); // Convert i32 to u64
         let client = Arc::new(SignerMiddleware::new(provider, wallet));
 
-        // Mock contract address
         let contract_address: Address = "0000000000000000000000000000000000000000".parse().unwrap(); // Removed '0x'
 
-        // Mock fingerprint hash
         let fingerprint_hash = mock_create_fingerprint_hash(&fingerprint).unwrap();
 
-        // Call the mock insert function
         mock_insert_fingerprint(client.clone(), contract_address, &fingerprint_hash).await.unwrap();
 
-        // Call the mock check function
         let is_appended = mock_check_fingerprint(client.clone(), contract_address, &fingerprint_hash).await.unwrap();
 
-        // Assert the result
         assert!(is_appended);
     }
 }

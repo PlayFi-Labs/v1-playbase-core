@@ -41,7 +41,6 @@ mod tests {
     use serde_json::json;
     use tokio;
 
-    // Mock functions
     async fn mock_load_json_objects(_path: &str) -> Vec<String> {
         vec![json!({
             "character": "test_character",
@@ -66,7 +65,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_main() {
-        // Replace the actual functions with mocks
         let json_objects = mock_load_json_objects("mock_path").await;
         let best_json_str = mock_run_json_comparator(&json_objects).unwrap();
         let best_json: Value = serde_json::from_str(&best_json_str).unwrap();
