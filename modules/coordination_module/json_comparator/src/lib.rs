@@ -31,3 +31,41 @@ pub fn run_json_comparator(json_objects: &[String]) -> Option<String> {
         return None;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_run_json_comparator_with_similar_jsons() {
+        let json1 = json!({"key": "value1"}).to_string();
+        let json2 = json!({"key": "value1"}).to_string();
+        let json_objects = vec![json1.clone(), json2.clone()];
+
+        let result = run_json_comparator(&json_objects);
+
+        assert!(result.is_some());
+        assert_eq!(result.unwrap(), json1);
+    }
+
+    #[test]
+    fn test_run_json_comparator_with_dissimilar_jsons() {
+        let json1 = json!({"key": "value1"}).to_string();
+        let json2 = json!({"key": "value2"}).to_string();
+        let json_objects = vec![json1, json2];
+
+        let result = run_json_comparator(&json_objects);
+
+        assert!(result.is_none());
+    }
+
+    #[test]
+    fn test_run_json_comparator_with_empty_list() {
+        let json_objects: Vec<String> = vec![];
+
+        let result = run_json_comparator(&json_objects);
+
+        assert!(result.is_none());
+    }
+}

@@ -24,3 +24,48 @@ pub async fn load_json_objects(directory: &str) -> Vec<String> {
 
     json_objects
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs::File;
+    use std::io::Write;
+    use tempfile::tempdir;
+    use serde_json::Value;
+
+    #[tokio::test]
+    async fn test_load_json_objects() {
+        let dir = tempdir().unwrap();
+        let dir_path = dir.path();
+
+        let file_path1 = dir_path.join("file1.json");
+        let mut file1 = File::create(&file_path1).unwrap();
+        writeln!(file1, r#"{{"key": "value1"}}"#).unwrap();
+
+        let file_path2 = dir_path.join("file2.json");
+        let mut file2 = File::create(&file_path2).unwrap();
+        writeln!(file2, r#"{{"key": "value2"}}"#).unwrap();
+
+        let json_objects = load_json_objects(dir_path.to_str().unwrap()).await;
+
+        let expected_json1: Value = serde_json::from_str(r#"{"key": "value1"}"#).unwrap();
+        let expected_json2: Value = serde_json::from_str(r#"{"key": "value2"}"#).unwrap();
+
+        let loaded_json1: Value = serde_json::from_str(&json_objects[0]).unwrap();
+        let loaded_json2: Value = serde_json::from_str(&json_objects[1]).unwrap();
+
+        assert_eq!(json_objects.len(), 2);
+        assert!(loaded_json1 == expected_json1 || loaded_json1 == expected_json2);
+        assert!(loaded_json2 == expected_json1 || loaded_json2 == expected_json2);
+    }
+
+    #[tokio::test]
+    async fn test_load_json_objects_empty_directory() {
+        let dir = tempdir().unwrap();
+        let dir_path = dir.path();
+
+        let json_objects = load_json_objects(dir_path.to_str().unwrap()).await;
+
+        assert!(json_objects.is_empty());
+    }
+}
