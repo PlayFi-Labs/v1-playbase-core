@@ -1,4 +1,5 @@
 use colored::*;
+use std::env;
 
 #[macro_use]
 pub mod data;
@@ -14,11 +15,14 @@ use hash::minhash_comparison::{calculate_similarities, find_best_similarity};
 /// # Returns
 /// - `Option<String>`: The JSON string with the highest similarity, if any.
 pub fn run_json_comparator(json_objects: &[String]) -> Option<String> {
-    let similarity_threshold = 0.72;
-    println!("\nSimilarity Threshold: {}%", format!("{:.1}", similarity_threshold * 100.0).blue());
-
-    let num_hash_functions = 100;
-    println!("Number of Hash Functions: {}\n", num_hash_functions.to_string().blue());
+    let similarity_threshold: f64 = env::var("SIMILARITY_THRESHOLD")
+        .unwrap_or_else(|_| "0.72".to_string())
+        .parse()
+        .unwrap_or(0.0);
+    let num_hash_functions: usize = env::var("NUM_HASH_FUNCTIONS")
+        .unwrap_or_else(|_| "100".to_string())
+        .parse()
+        .unwrap_or(0);
 
     let json_strs: Vec<&str> = json_objects.iter().map(|s| s.as_str()).collect();
 
