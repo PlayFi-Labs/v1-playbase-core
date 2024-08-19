@@ -6,7 +6,7 @@ pub mod poseidon;
 
 use serde::{Serialize, Deserialize};
 use anyhow::Result;
-use lasso_jolt::{store, restore};  // Assuming the crate is named `my_library`
+use lasso_jolt::{store, restore};
 use crate::json_format::JsonRecords;
 
 #[derive(Serialize, Deserialize, Debug)]
