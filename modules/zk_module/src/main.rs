@@ -3,9 +3,9 @@ use anyhow::Result;
 use mongodb::bson::doc;
 use dotenv::dotenv;
 use std::env;
-use lasso_jolt::{store, restore};
-use lasso_jolt::json_format::JsonRecords;
-use lasso_jolt::mongo_connection::mongo_connection::MongoDB;
+use utils::{store, restore};
+use utils::json_format::JsonRecords;
+use utils::mongo_connection::mongo_connection::MongoDB;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct MerkleTreeParameters {
@@ -31,7 +31,7 @@ async fn main() -> Result<()> {
         game: "Game1".to_string(),
         character: "Character2".to_string(),
         ability: "Ability1".to_string(),
-        place: "Place1".to_string(),
+        place: "Place123".to_string(),
         place2: "Place2".to_string(),
         aimodel: 1234567,
         aiversion: 1,
