@@ -10,4 +10,6 @@ tokio = { version = "1", features = ["full"] }
 colored = "2.0"
 async-trait = "0.1"
 anyhow = "1.0.86"
+dotenv = "0.15.0"
+mongodb = { version = "3.0.1", features = ["sync"] }
 lasso_jolt = { path = "lasso_jolt" }
