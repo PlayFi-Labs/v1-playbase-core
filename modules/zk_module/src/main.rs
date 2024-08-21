@@ -58,11 +58,14 @@ async fn main() -> Result<()> {
         println!("Queried Record: {:?}", record);
 
         // Example 2: Using the `store` and `restore` functions with `MerkleTreeParameters`
-        let _merkle_params = MerkleTreeParameters {
+        let merkle_params = MerkleTreeParameters {
             level: 3,
             g: "generator_g".to_string(),
             g_tilde: "generator_g_tilde".to_string(),
         };
+
+        let merkle_path = "data/merkle_params.json";
+        store(&merkle_params, merkle_path)?;
     }
 
     Ok(())
