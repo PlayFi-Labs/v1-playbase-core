@@ -43,7 +43,7 @@ async fn main() -> Result<()> {
         hash_inputdata: [0u8; 32],
     };
 
-    // Insert MerkleTreeParameters into the new MongoDB collection
+    // Insert MerkleTreeParameters into the JSON MongoDB collection
     println!("Attempting to insert JSON Parameters:{:?}", json_data);
     match json_collection.insert_one(&json_data).await {
         Ok(insert_result) => {
@@ -67,14 +67,14 @@ async fn main() -> Result<()> {
         g_tilde: "generator_g_tilde".to_string(),
     };
 
-    // New database and collection for MerkleTreeParameters
+    // Merkle database and collection for MerkleTreeParameters
     let merkle_db_name = env::var("MERKLE_MONGO_DB").expect("DB_NAME must be set");
     let merkle_collection_name = json_collection_name.to_string() + "-merkle";
     let merkle_mongo_connection = MongoDB::new(&mongo_uri, &merkle_db_name, &merkle_collection_name).await?;
     let merkle_database = merkle_mongo_connection.get_database();
     let merkle_collection: mongodb::Collection<MerkleTreeParameters> = merkle_database.collection::<MerkleTreeParameters>(&merkle_collection_name);
 
-    // Insert MerkleTreeParameters into the new MongoDB collection
+    // Insert MerkleTreeParameters into the Merkle MongoDB collection
     println!("Attempting to insert Merkle Tree Parameters: {:?}", merkle_params);
     match merkle_collection.insert_one(&merkle_params).await {
         Ok(insert_result) => {
