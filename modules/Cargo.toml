@@ -4,4 +4,6 @@ members = [
     "coordination_module",
     "storage_module",
     "zk_module",
+    "zk_module/utils",
+    "zk_module/circom",
 ]
