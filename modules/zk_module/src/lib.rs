@@ -1,6 +1,5 @@
 use anyhow::{Result, anyhow};
 use mongodb::bson::doc;
-use utils::{store, restore};
 use utils::mongo_connection::mongo_connection::MongoDB;
 use serde::{Serialize, Deserialize};
 use std::fs::File;
@@ -49,12 +48,6 @@ impl JsonRecords {
             }
         }
 
-        // Guardar y restaurar para verificar la integridad
-        let json_path = "data/json_record.json";
-        store(self, json_path)?;
-        let restored_data: JsonRecords = restore(json_path)?;
-        println!("Restored JSON Data: {:?}", restored_data);
-
         Ok(())
     }
 
@@ -100,9 +93,6 @@ impl MerkleTreeParameters {
                 eprintln!("Failed to insert Merkle Tree document: {:?}", e);
             }
         }
-
-        let merkle_path = format!("data/{}.json", collection_name);
-        store(self, &merkle_path)?;
 
         Ok(())
     }
