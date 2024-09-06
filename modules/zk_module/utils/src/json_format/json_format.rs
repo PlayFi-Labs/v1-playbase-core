@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize, Serialize, Debug, Clone)]
 // DB Sruct
 pub struct JsonRecords {
+    pub user: String,
     pub game: String,
     pub character: String,
     pub ability: String,
@@ -28,6 +29,7 @@ pub struct JsonRecords {
 pub fn json_random_values() -> JsonRecords {
     let mut rng = rand::thread_rng();
     
+    let user = (0..10).map(|_| rng.gen_range(b'a'..b'z') as char).collect();
     let game = (0..10).map(|_| rng.gen_range(b'a'..b'z') as char).collect();
     let character = (0..10).map(|_| rng.gen_range(b'a'..b'z') as char).collect();
     let ability = (0..10).map(|_| rng.gen_range(b'a'..b'z') as char).collect();
@@ -42,7 +44,7 @@ pub fn json_random_values() -> JsonRecords {
     let source: u8 = rng.gen_range(0..4); // 0:TV, 1:Sport, 2:LiveWeather, 4:Document
     let sourcetype: u8 = rng.gen_range(0..4); 
     let hash_inputdata: ByteArray32 = [2; 32];
-    JsonRecords { game, character, ability, place, place2, aimodel, aiversion, ainode, uploader, timestamp, source, sourcetype, hash_inputdata }
+    JsonRecords { user, game, character, ability, place, place2, aimodel, aiversion, ainode, uploader, timestamp, source, sourcetype, hash_inputdata }
 }
 
 fn read_file(path: &Path) -> Result<File> {

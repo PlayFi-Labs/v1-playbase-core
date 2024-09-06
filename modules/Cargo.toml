@@ -5,4 +5,5 @@ members = [
     "storage_module",
     "zk_module",
     "zk_module/utils",
+    "zk_module/circom",
 ]

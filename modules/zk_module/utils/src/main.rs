@@ -19,6 +19,7 @@ struct MerkleTreeParameters {
 fn main() -> Result<()> {
     // Example 1: Using the `store` and `restore` functions with `JsonRecords`
     let json_data = JsonRecords {
+        user: "user1".to_string(),
         game: "Game1".to_string(),
         character: "Character1".to_string(),
         ability: "Ability1".to_string(),
