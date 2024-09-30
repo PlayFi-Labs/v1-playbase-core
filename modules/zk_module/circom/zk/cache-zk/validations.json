@@ -1,0 +1,30 @@
+{
+  "version": "3.4",
+  "log": [
+    {
+      "contracts/Groth16Verifier.sol:Groth16Verifier": {
+        "src": "contracts/Groth16Verifier.sol:23",
+        "version": {
+          "withMetadata": "b3674e29e0294fda91dfd42e853036ebae41eae8b9a4504b6fc5c9fc6884e022",
+          "withoutMetadata": "b3674e29e0294fda91dfd42e853036ebae41eae8b9a4504b6fc5c9fc6884e022",
+          "linkedWithoutMetadata": "b3674e29e0294fda91dfd42e853036ebae41eae8b9a4504b6fc5c9fc6884e022"
+        },
+        "inherit": [],
+        "libraries": [],
+        "methods": [
+          "verifyProof(uint256[2],uint256[2][2],uint256[2],uint256[1])"
+        ],
+        "linkReferences": [],
+        "errors": [],
+        "layout": {
+          "storage": [],
+          "types": {},
+          "layoutVersion": "1.2",
+          "flat": false,
+          "namespaces": {}
+        },
+        "solcVersion": "0.8.16"
+      }
+    }
+  ]
+}

@@ -5,3 +5,6 @@ members = [
     "modules/zk_module",
     "modules/storage_module"
 ]
+
+[patch.crates-io]
+rand = { version = "0.8", features = ["std"] }

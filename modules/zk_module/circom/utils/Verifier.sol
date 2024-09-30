@@ -1,170 +1,170 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: GPL-3.0
+/*
+    Copyright 2021 0KIMS association.
 
-pragma solidity ^0.6.0;
+    This file is generated with [snarkJS](https://github.com/iden3/snarkjs).
 
-library Pairing {
-    uint256 constant PRIME_Q = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
+    snarkJS is a free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    struct G1Point {
-        uint256 X;
-        uint256 Y;
-    }
+    snarkJS is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
+    License for more details.
 
-    // Encoding of field elements is: X[0] * z + X[1]
-    struct G2Point {
-        uint256[2] X;
-        uint256[2] Y;
-    }
+    You should have received a copy of the GNU General Public License
+    along with snarkJS. If not, see <https://www.gnu.org/licenses/>.
+*/
 
-    /*
-     * @return The negation of p, i.e. p.plus(p.negate()) should be zero
-     */
-    function negate(G1Point memory p) internal pure returns (G1Point memory) {
-        // The prime q in the base field F_q for G1
-        if (p.X == 0 && p.Y == 0) {
-            return G1Point(0, 0);
-        } else {
-            return G1Point(p.X, PRIME_Q - (p.Y % PRIME_Q));
-        }
-    }
+pragma solidity >=0.7.0 <0.9.0;
 
-    /*
-     * @return r the sum of two points of G1
-     */
-    function plus(
-        G1Point memory p1,
-        G1Point memory p2
-    ) internal view returns (G1Point memory r) {
-        uint256[4] memory input = [
-            p1.X, p1.Y,
-            p2.X, p2.Y
-        ];
-        bool success;
+contract Groth16Verifier {
+    // Scalar field size
+    uint256 constant r    = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
+    // Base field size
+    uint256 constant q   = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
 
-        // solium-disable-next-line security/no-inline-assembly
+    // Verification Key data
+    uint256 constant alphax  = 10916056479079277735532168969112409232411324399862811272357846961257021646023;
+    uint256 constant alphay  = 15183270499024629127086199211798792547762013095656080728771980035774723809353;
+    uint256 constant betax1  = 6775551785108386356867377222424049766515272745537045639078695851389750962330;
+    uint256 constant betax2  = 15564326792023412248507906955186726361290743381977656268601587411692093938460;
+    uint256 constant betay1  = 3378828085213421665553638716307080449342771812574193300803735251272460129351;
+    uint256 constant betay2  = 14141795181909022983821385590271195361722759265385981967972541285442574477913;
+    uint256 constant gammax1 = 11559732032986387107991004021392285783925812861821192530917403151452391805634;
+    uint256 constant gammax2 = 10857046999023057135944570762232829481370756359578518086990519993285655852781;
+    uint256 constant gammay1 = 4082367875863433681332203403145435568316851327593401208105741076214120093531;
+    uint256 constant gammay2 = 8495653923123431417604973247489272438418190587263600148770280649306958101930;
+    uint256 constant deltax1 = 6844458707936451503283703773289071498646704708641237488912068507100496607388;
+    uint256 constant deltax2 = 3189198156634257687462041103399497521526251422803332732208209496051591979160;
+    uint256 constant deltay1 = 15528344726624034287262836695603568824882865904479942005568908218579916564199;
+    uint256 constant deltay2 = 2638508038507924472867203849954797411606302113185642943338384110143666286633;
+
+    
+    uint256 constant IC0x = 7248727167497016699896938291463998000837977837888495790934910885893032491328;
+    uint256 constant IC0y = 16776592753116640245175101726202929827991973415372979361797808298437992990120;
+    
+    uint256 constant IC1x = 14212960957163205641349969455787434735873854169279027492299365648200252149847;
+    uint256 constant IC1y = 17661629072104454372545064006361348967223271502259693103715687816390465801113;
+    
+ 
+    // Memory data
+    uint16 constant pVk = 0;
+    uint16 constant pPairing = 128;
+
+    uint16 constant pLastMem = 896;
+
+    function verifyProof(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[1] calldata _pubSignals) public view returns (bool) {
         assembly {
-            success := staticcall(sub(gas(), 2000), 6, input, 0xc0, r, 0x60)
-            // Use "invalid" to make gas estimation work
-            switch success case 0 { invalid() }
-        }
+            function checkField(v) {
+                if iszero(lt(v, r)) {
+                    mstore(0, 0)
+                    return(0, 0x20)
+                }
+            }
+            
+            // G1 function to multiply a G1 value(x,y) to value in an address
+            function g1_mulAccC(pR, x, y, s) {
+                let success
+                let mIn := mload(0x40)
+                mstore(mIn, x)
+                mstore(add(mIn, 32), y)
+                mstore(add(mIn, 64), s)
 
-        require(success, "pairing-add-failed");
-    }
+                success := staticcall(sub(gas(), 2000), 7, mIn, 96, mIn, 64)
 
-    /*
-     * @return r the product of a point on G1 and a scalar, i.e.
-     *         p == p.scalarMul(1) and p.plus(p) == p.scalarMul(2) for all
-     *         points p.
-     */
-    function scalarMul(G1Point memory p, uint256 s) internal view returns (G1Point memory r) {
-        uint256[3] memory input = [p.X, p.Y, s];
-        bool success;
+                if iszero(success) {
+                    mstore(0, 0)
+                    return(0, 0x20)
+                }
 
-        // solium-disable-next-line security/no-inline-assembly
-        assembly {
-            success := staticcall(sub(gas(), 2000), 7, input, 0x80, r, 0x60)
-            // Use "invalid" to make gas estimation work
-            switch success case 0 { invalid() }
-        }
+                mstore(add(mIn, 64), mload(pR))
+                mstore(add(mIn, 96), mload(add(pR, 32)))
 
-        require(success, "pairing-mul-failed");
-    }
+                success := staticcall(sub(gas(), 2000), 6, mIn, 128, pR, 64)
 
-    /* @return The result of computing the pairing check
-     *         e(p1[0], p2[0]) *  .... * e(p1[n], p2[n]) == 1
-     *         For example,
-     *         pairing([P1(), P1().negate()], [P2(), P2()]) should return true.
-     */
-    function pairing(
-        G1Point memory a1,
-        G2Point memory a2,
-        G1Point memory b1,
-        G2Point memory b2,
-        G1Point memory c1,
-        G2Point memory c2,
-        G1Point memory d1,
-        G2Point memory d2
-    ) internal view returns (bool) {
-        uint256[24] memory input = [
-            a1.X, a1.Y, a2.X[0], a2.X[1], a2.Y[0], a2.Y[1],
-            b1.X, b1.Y, b2.X[0], b2.X[1], b2.Y[0], b2.Y[1],
-            c1.X, c1.Y, c2.X[0], c2.X[1], c2.Y[0], c2.Y[1],
-            d1.X, d1.Y, d2.X[0], d2.X[1], d2.Y[0], d2.Y[1]
-        ];
-        uint256[1] memory out;
-        bool success;
+                if iszero(success) {
+                    mstore(0, 0)
+                    return(0, 0x20)
+                }
+            }
 
-        // solium-disable-next-line security/no-inline-assembly
-        assembly {
-            success := staticcall(sub(gas(), 2000), 8, input, mul(24, 0x20), out, 0x20)
-            // Use "invalid" to make gas estimation work
-            switch success case 0 { invalid() }
-        }
+            function checkPairing(pA, pB, pC, pubSignals, pMem) -> isOk {
+                let _pPairing := add(pMem, pPairing)
+                let _pVk := add(pMem, pVk)
 
-        require(success, "pairing-opcode-failed");
-        return out[0] != 0;
-    }
-}
+                mstore(_pVk, IC0x)
+                mstore(add(_pVk, 32), IC0y)
 
-contract Verifier {
-    uint256 constant SNARK_SCALAR_FIELD = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
-    uint256 constant PRIME_Q = 21888242871839275222246405745257275088696311157297823662689037894645226208583;
-    using Pairing for *;
+                // Compute the linear combination vk_x
+                
+                g1_mulAccC(_pVk, IC1x, IC1y, calldataload(add(pubSignals, 0)))
+                
 
-    struct VerifyingKey {
-        Pairing.G1Point alfa1;
-        Pairing.G2Point beta2;
-        Pairing.G2Point gamma2;
-        Pairing.G2Point delta2;
-        Pairing.G1Point[2] IC;
-    }
+                // -A
+                mstore(_pPairing, calldataload(pA))
+                mstore(add(_pPairing, 32), mod(sub(q, calldataload(add(pA, 32))), q))
 
-    function verifyingKey() internal pure returns (VerifyingKey memory vk) {
-        vk.alfa1 = Pairing.G1Point(uint256(3762036959393060079225684740935153225028955993384798011974144356565407798808), uint256(3661162599682607630174479620268408137965896336393849791858559036314771279989));
-        vk.beta2 = Pairing.G2Point([uint256(5346201862668764915058218889128616893864536328960267115315278384313783937101), uint256(6974835308836031841089354451549741218018049235357684222167955344580553163586)], [uint256(20328125737086888980517077579154441968452112753480413204558497828194843419749), uint256(9386664680147137664568991237501905126293328047180883504174624673985255817652)]);
-        vk.gamma2 = Pairing.G2Point([uint256(15382380131848603891519139251547127187561736246671263612255265045714835378055), uint256(15287701393842856232879456094516553628879662509973560781804140635284234794209)], [uint256(12274988164053159621966190991398763044891403315462370655930593054864170839171), uint256(21589833158671547641871221839827333795487042263784268286604655832721040198484)]);
-        vk.delta2 = Pairing.G2Point([uint256(11143212222866636314823192616563303079401928340303890528836607831970179806789), uint256(13331124801754369423633653930082855153325622239569058392504196508889523196702)], [uint256(13543011526888219601814894218115489247789519935779400385410375337637912966341), uint256(8563747029807307179254228135634398187346830648809822525449379218160587125964)]);
-        vk.IC[0] = Pairing.G1Point(uint256(9510693855540199875830097001813846733923496916391801831202239549184957509675), uint256(11740254637438439163988426202520839282272969130738213691707533239684071700178));
-        vk.IC[1] = Pairing.G1Point(uint256(5526738246112753016401514016995064589041378364300396911374672605781139128942), uint256(12263045113492767125023770939271462461909099520042075920850417872770244205546));
+                // B
+                mstore(add(_pPairing, 64), calldataload(pB))
+                mstore(add(_pPairing, 96), calldataload(add(pB, 32)))
+                mstore(add(_pPairing, 128), calldataload(add(pB, 64)))
+                mstore(add(_pPairing, 160), calldataload(add(pB, 96)))
 
-    }
+                // alpha1
+                mstore(add(_pPairing, 192), alphax)
+                mstore(add(_pPairing, 224), alphay)
 
-    /*
-     * @returns Whether the proof is valid given the hardcoded verifying key
-     *          above and the public inputs
-     */
-    function verifyProof(
-        bytes memory proof,
-        uint256[1] memory input
-    ) public view returns (bool) {
-        uint256[8] memory p = abi.decode(proof, (uint256[8]));
-        for (uint8 i = 0; i < p.length; i++) {
-            // Make sure that each element in the proof is less than the prime q
-            require(p[i] < PRIME_Q, "verifier-proof-element-gte-prime-q");
-        }
-        Pairing.G1Point memory proofA = Pairing.G1Point(p[0], p[1]);
-        Pairing.G2Point memory proofB = Pairing.G2Point([p[2], p[3]], [p[4], p[5]]);
-        Pairing.G1Point memory proofC = Pairing.G1Point(p[6], p[7]);
+                // beta2
+                mstore(add(_pPairing, 256), betax1)
+                mstore(add(_pPairing, 288), betax2)
+                mstore(add(_pPairing, 320), betay1)
+                mstore(add(_pPairing, 352), betay2)
 
-        VerifyingKey memory vk = verifyingKey();
-        // Compute the linear combination vkX
-        Pairing.G1Point memory vkX = vk.IC[0];
-        for (uint256 i = 0; i < input.length; i++) {
-            // Make sure that every input is less than the snark scalar field
-            require(input[i] < SNARK_SCALAR_FIELD, "verifier-input-gte-snark-scalar-field");
-            vkX = Pairing.plus(vkX, Pairing.scalarMul(vk.IC[i + 1], input[i]));
-        }
+                // vk_x
+                mstore(add(_pPairing, 384), mload(add(pMem, pVk)))
+                mstore(add(_pPairing, 416), mload(add(pMem, add(pVk, 32))))
 
-        return Pairing.pairing(
-            Pairing.negate(proofA),
-            proofB,
-            vk.alfa1,
-            vk.beta2,
-            vkX,
-            vk.gamma2,
-            proofC,
-            vk.delta2
-        );
-    }
-}
 
+                // gamma2
+                mstore(add(_pPairing, 448), gammax1)
+                mstore(add(_pPairing, 480), gammax2)
+                mstore(add(_pPairing, 512), gammay1)
+                mstore(add(_pPairing, 544), gammay2)
+
+                // C
+                mstore(add(_pPairing, 576), calldataload(pC))
+                mstore(add(_pPairing, 608), calldataload(add(pC, 32)))
+
+                // delta2
+                mstore(add(_pPairing, 640), deltax1)
+                mstore(add(_pPairing, 672), deltax2)
+                mstore(add(_pPairing, 704), deltay1)
+                mstore(add(_pPairing, 736), deltay2)
+
+
+                let success := staticcall(sub(gas(), 2000), 8, _pPairing, 768, _pPairing, 0x20)
+
+                isOk := and(success, mload(_pPairing))
+            }
+
+            let pMem := mload(0x40)
+            mstore(0x40, add(pMem, pLastMem))
+
+            // Validate that all evaluations ∈ F
+            
+            checkField(calldataload(add(_pubSignals, 0)))
+            
+            checkField(calldataload(add(_pubSignals, 32)))
+            
+
+            // Validate all evaluations
+            let isValid := checkPairing(_pA, _pB, _pC, _pubSignals, pMem)
+
+            mstore(0, isValid)
+             return(0, 0x20)
+         }
+     }
+ }

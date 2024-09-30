@@ -2,6 +2,7 @@ pragma circom 2.1.5;
 include "./circomlib/circuits/poseidon.circom";
 
 template SimpleProof() {
+    signal input user[8];
     signal input game[16];
     signal input character[12];
     signal input ability[10];
