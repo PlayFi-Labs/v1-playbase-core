@@ -20,6 +20,7 @@ pub async fn cm_write() -> Result<(), Box<dyn Error>> {
     // Parse the resulting JSON object to create a Fingerprint
     let best_json: Value = serde_json::from_str(&best_json_str)?;
     let fingerprint = Fingerprint {
+        user: best_json["user"].as_str().unwrap_or_default().to_string(),
         gamer: best_json["character"].as_str().unwrap_or_default().to_string(),
         strikes: 0,
         place: best_json["place"].as_str().unwrap_or_default().to_string(),
@@ -67,6 +68,7 @@ mod tests {
         let best_json_str = mock_run_json_comparator(&json_objects).unwrap();
         let best_json: Value = serde_json::from_str(&best_json_str).unwrap();
         let fingerprint = Fingerprint {
+            user: best_json["user"].as_str().unwrap_or_default().to_string(),
             gamer: best_json["character"].as_str().unwrap_or_default().to_string(),
             strikes: 0,
             place: best_json["place"].as_str().unwrap_or_default().to_string(),

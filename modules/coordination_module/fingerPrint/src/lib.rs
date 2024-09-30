@@ -14,6 +14,7 @@ use serde::{Serialize, Deserialize};
 /// Represents a Fingerprint object.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Fingerprint {
+    pub user: String,
     pub gamer: String,
     pub strikes: u64,
     pub place: String,
@@ -81,6 +82,7 @@ mod tests {
     #[tokio::test]
     async fn test_run_fingerprint() {
         let fingerprint = Fingerprint {
+            user: "test_user".to_string(),
             gamer: "test_gamer".to_string(),
             strikes: 0,
             place: "test_place".to_string(),
