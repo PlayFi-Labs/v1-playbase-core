@@ -1,6 +1,7 @@
 use json::load_json_objects;
 use json_comparator::run_json_comparator;
 use fingerprint::{run_fingerprint, process_query_fingerprint, Fingerprint};
+use node_request::request_to_node;
 use serde_json::Value;
 use std::error::Error;
 
@@ -38,15 +39,19 @@ pub async fn cm_write() -> Result<(), Box<dyn Error>> {
 }
 
 /// Function `cm_query` handles querying a JSON object and checks if the generated fingerprint exists on-chain.
+/// This function also request to another node to retrieve data.
 ///
 /// # Parameters
-/// - `generated_json`: A reference to the JSON object generated from the zk-module.
+/// - `fields`: A reference to the JSON object generated from the zk-module.
 ///
 /// # Returns
 /// - `Ok(true)` if the fingerprint is found on-chain or `Err(Box<dyn Error>)` otherwise.
-pub async fn cm_query(generated_json: &Value) -> Result<bool, Box<dyn Error>> {
-    // Pass the JSON object to `process_query_fingerprint` for blockchain verification
-    let result = process_query_fingerprint(generated_json).await?;
+pub async fn cm_query(fields: &Value) -> Result<bool, Box<dyn Error>> {
+    // Mock sending a request to another node
+    let mock_response = request_to_node(fields).await?;
+
+    // Process the mock response by verifying the fingerprint
+    let result = process_query_fingerprint(&mock_response).await?;
 
     // If the fingerprint exists on-chain, return Ok(true)
     Ok(result)
@@ -104,17 +109,18 @@ mod tests {
     /// Test for `cm_query` function.
     #[tokio::test]
     async fn test_run_cm_query() {
-        let generated_json = json!({
-            "user": "test_user",
-            "game": "test_games",
-            "strikes": 0,
-            "place": "test_place",
-            "ability": "test_ability",
-            "place2": "test_place2"
+        let query_fields = json!({
+            "user": "new_user",
+            "game": "new_game",
+            "place": "new_place"
         });
 
-        // Mock the `process_query_fingerprint` function for the test
-        let result = mock_process_query_fingerprint(&generated_json).await;
+        // Mock sending a request to another node and receiving a response
+        let mock_response = request_to_node(&query_fields).await.unwrap();
+        assert_eq!(mock_response, query_fields);
+
+        // Mock processing the response by verifying the fingerprint
+        let result = mock_process_query_fingerprint(&mock_response).await;
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), true);
     }
