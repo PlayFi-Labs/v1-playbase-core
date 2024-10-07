@@ -27,17 +27,22 @@ pub async fn request_to_node(fields: &Value) -> Result<Value, Box<dyn Error>> {
 mod tests {
     use super::*;
     use serde_json::json;
+    use tokio;
+    use serde_json::Value;
 
-    #[tokio::test]
-    async fn test_mock_request_to_node() {
-        // Example JSON data to send in the request
-        let fields = json!({
+    async fn mock_load_query_fields() -> Value {
+        json!({
             "gamer": "test_user",
             "place": "test_place"
-        });
+        })
+    }
 
-        // Call the mock function and check the response
-        let result = mock_request_to_node(&fields).await;
+    #[tokio::test]
+    async fn test_request_to_node() {
+        let fields = mock_load_query_fields().await;
+
+        // Call the real function and check the response
+        let result = request_to_node(&fields).await;
 
         // Ensure that the result is okay and matches the input fields
         assert!(result.is_ok());
