@@ -12,3 +12,8 @@ async-trait = "0.1"
 json_comparator = { path = "json_comparator" }
 fingerprint = { path = "fingerprint" }
 json = { path = "json" }
+node_request = { path = "node_request" }
+
+[lib]
+name = "coordination_module"
+path = "src/lib.rs"

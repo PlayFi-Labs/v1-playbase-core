@@ -1,82 +1,51 @@
-
-use json::load_json_objects;
-use json_comparator::run_json_comparator;
-use fingerprint::{run_fingerprint, Fingerprint};
-use serde_json::Value;
+use tokio::task;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-
-    // Load JSON objects from the specified directory
-    let json_objects = load_json_objects("modules/coordination_module/json/src/json_objects").await;
-
-    // Run the JSON comparator and get the JSON object with the highest similarity
-    let best_json_str = match run_json_comparator(&json_objects) {
-        Some(json) => json,
-        None => {
-            println!("No JSON objects met the similarity threshold.");
-            return Ok(());
+    // Spawn the cm_write task to run in parallel
+    let write_task = task::spawn(async {
+        if let Err(e) = coordination_module::cm_write().await {
+            eprintln!("Error in cm_write: {}", e);
+        } else {
+            println!("cm_write executed successfully.");
         }
-    };
+    });
 
-    // Parse the resulting JSON object to create a Fingerprint
-    let best_json: Value = serde_json::from_str(&best_json_str)?;
-    let fingerprint = Fingerprint {
-        gamer: best_json["character"].as_str().unwrap_or_default().to_string(),
-        strikes: 0,
-        place: best_json["place"].as_str().unwrap_or_default().to_string(),
-        weapon: best_json["ability"].as_str().unwrap_or_default().to_string(),
-        place2: best_json["place2"].as_str().unwrap_or_default().to_string(),
-    };
+    // Spawn the cm_query task to run in parallel with a simulated JSON
+    let query_task = task::spawn(async {
+        println!("Starting cm_query task...");
 
-    // Run the fingerprint process with the resulting Fingerprint object
-    run_fingerprint(fingerprint).await?;
+        let generated_json = serde_json::json!({
+            "user": "Atujlssasd",
+            "game": "mgkmkwnheu",
+            "character": "mgkmkwnheu",
+            "strikes": 0,
+            "place": "qlomlmqxmt",
+            "place2": "xingsaseys"
+        });
+
+        println!("Generated JSON for query: {}", generated_json);
+
+        match coordination_module::cm_query(&generated_json).await {
+            Ok(result) => {
+                if result {
+                    println!("Fingerprint found on the blockchain.");
+                } else {
+                    println!("Fingerprint not found on the blockchain.");
+                }
+            }
+            Err(e) => eprintln!("Error in cm_query: {}", e),
+        }
+
+        println!("Finished cm_query task.");
+    });
+
+    // Wait for both tasks to complete
+    let _ = tokio::try_join!(write_task, query_task)?;
+
+    println!("\n====================");
+    println!("All tasks have been completed.");
+    println!("====================\n");
 
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use serde_json::json;
-    use tokio;
-
-    async fn mock_load_json_objects(_path: &str) -> Vec<String> {
-        vec![json!({
-            "character": "test_character",
-            "place": "test_place",
-            "ability": "test_ability",
-            "place2": "test_place2"
-        }).to_string()]
-    }
-
-    fn mock_run_json_comparator(_json_objects: &[String]) -> Option<String> {
-        Some(json!({
-            "character": "test_character",
-            "place": "test_place",
-            "ability": "test_ability",
-            "place2": "test_place2"
-        }).to_string())
-    }
-
-    async fn mock_run_fingerprint(_fingerprint: Fingerprint) -> Result<(), Box<dyn std::error::Error>> {
-        Ok(())
-    }
-
-    #[tokio::test]
-    async fn test_main() {
-        let json_objects = mock_load_json_objects("mock_path").await;
-        let best_json_str = mock_run_json_comparator(&json_objects).unwrap();
-        let best_json: Value = serde_json::from_str(&best_json_str).unwrap();
-        let fingerprint = Fingerprint {
-            gamer: best_json["character"].as_str().unwrap_or_default().to_string(),
-            strikes: 0,
-            place: best_json["place"].as_str().unwrap_or_default().to_string(),
-            weapon: best_json["ability"].as_str().unwrap_or_default().to_string(),
-            place2: best_json["place2"].as_str().unwrap_or_default().to_string(),
-        };
-
-        let result = mock_run_fingerprint(fingerprint).await;
-        assert!(result.is_ok());
-    }
 }

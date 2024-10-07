@@ -8,16 +8,19 @@ use ethers::providers::{Http, Provider};
 use ethers::signers::LocalWallet;
 use ethers::types::Address;
 use std::env;
+use serde_json::Value;
 use std::sync::Arc;
 use serde::{Serialize, Deserialize};
+
+use crate::check::check_hash::process_and_check_fingerprint;
 
 /// Represents a Fingerprint object.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Fingerprint {
-    pub gamer: String,
+    pub user: String,
+    pub game: String,
     pub strikes: u64,
     pub place: String,
-    pub weapon: String,
     pub place2: String,
 }
 
@@ -52,6 +55,37 @@ pub async fn run_fingerprint(fingerprint: Fingerprint) -> Result<(), Box<dyn std
     Ok(())
 }
 
+/// Handles the query by preparing the client and contract details, and invoking the existing
+/// `process_and_check_fingerprint` function.
+///
+/// # Parameters
+/// - `generated_json`: The JSON object returned by the zk-module.
+///
+/// # Returns
+/// - `Result<bool, Box<dyn std::error::Error>>`: Returns `true` if the fingerprint is appended, otherwise returns an error.
+pub async fn process_query_fingerprint(
+    generated_json: &Value,
+) -> Result<bool, Box<dyn std::error::Error>> {
+    // Load environment variables for the blockchain setup
+    dotenv::dotenv().ok();
+
+    // Get the necessary values from environment variables
+    let zksync_url = env::var("ZKSYNC_URL")?;
+    let chain_id: u64 = env::var("CHAIN_ID")?.parse()?;
+    let contract_address_str = env::var("FINGERPRINT_PROXY_SC")?;
+    let private_key = env::var("ZKSYNC_SEPOLIA_PRIVATE_KEY")?;
+
+    // Set up the blockchain provider and wallet
+    let provider = Provider::<Http>::try_from(zksync_url)?;
+    let contract_address: Address = contract_address_str.parse()?;
+    let wallet: LocalWallet = private_key.parse()?;
+    let wallet = wallet.with_chain_id(chain_id);
+    let client = Arc::new(SignerMiddleware::new(provider, wallet));
+
+    // Invoke the existing `process_and_check_fingerprint` function
+    process_and_check_fingerprint(client.clone(), contract_address, generated_json).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -78,13 +112,14 @@ mod tests {
         Ok(true)
     }
 
+    /// Test function to validate the `run_fingerprint` process.
     #[tokio::test]
     async fn test_run_fingerprint() {
         let fingerprint = Fingerprint {
-            gamer: "test_gamer".to_string(),
+            user: "test_user".to_string(),
+            game: "test_game".to_string(),
             strikes: 0,
             place: "test_place".to_string(),
-            weapon: "test_weapon".to_string(),
             place2: "test_place2".to_string(),
         };
 
@@ -106,6 +141,36 @@ mod tests {
 
         let is_appended = mock_check_fingerprint(client.clone(), contract_address, &fingerprint_hash).await.unwrap();
 
+        assert!(is_appended);
+    }
+    /// Test function to validate the `process_query_fingerprint` process.
+    #[tokio::test]
+    async fn test_process_query_fingerprint() {
+        // Create a mock JSON object representing a Fingerprint returned by the zk-module
+        let json_obj = serde_json::json!({
+            "user": "test_user",
+            "game": "test_game",
+            "strikes": 0,
+            "place": "test_place",
+            "place2": "test_place2"
+        });
+
+        // Mock provider and wallet
+        let provider = Provider::<Http>::try_from("http://localhost:8545").unwrap();
+        let wallet: LocalWallet = "4c0883a69102937d6231471b5dbb6204fe5129617082796e8e1a1e3b7a1e7e3e".parse().unwrap();
+        let wallet = wallet.with_chain_id(1u64);
+        let client = Arc::new(SignerMiddleware::new(provider, wallet));
+
+        // Mock contract address
+        let contract_address: Address = "0000000000000000000000000000000000000000".parse().unwrap();
+
+        // Mock creating the fingerprint hash
+        let fingerprint_hash = mock_create_fingerprint_hash(&serde_json::from_value(json_obj.clone()).unwrap()).unwrap();
+
+        // Simulate checking the fingerprint hash on-chain
+        let is_appended = mock_check_fingerprint(client.clone(), contract_address, &fingerprint_hash).await.unwrap();
+
+        // Assert that the fingerprint is appended
         assert!(is_appended);
     }
 }
